@@ -4,7 +4,7 @@
     "paths": {
       "@/public/*": ["public/*"],
       "@/app/*": ["src/app/*"],
-      "@/modules/*": ["src/modules/*"],
+      "@/modules/*": ["src/components/modules/*"],
       "@/hooks/*": ["src/hooks/*"],
       "@/utils/*": ["src/utils/*"],
     },

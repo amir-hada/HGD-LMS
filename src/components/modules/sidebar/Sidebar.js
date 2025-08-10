@@ -1,4 +1,4 @@
-"use client"; // چون داخل app dir هستیم و از useState استفاده می‌کنیم
+"use client";
 
 import React, { useState, createContext } from "react";
 import Link from "next/link";
@@ -17,18 +17,33 @@ import Tooltip from "@mui/material/Tooltip";
 import CottageOutlinedIcon from "@mui/icons-material/CottageOutlined";
 import AccessAlarms from "@mui/icons-material/AccessAlarms";
 import CircleOutlined from "@mui/icons-material/CircleOutlined";
-import { LogoutOutlined, ManageAccounts, SchoolOutlined, VideoLibrary } from "@mui/icons-material";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {
+  LogoutOutlined,
+  ManageAccounts,
+  SchoolOutlined,
+  VideoLibrary,
+} from "@mui/icons-material";
+
+import { useMediaQuery } from "@mui/material";
+
 import { yekanFont } from "@/utils/fonts";
 
 export const SidebarContext = createContext();
 
 const Links = ({ component: Component = "a", children, ...props }) => {
   if (Component === Link) {
-    // حذف <a> داخل Link و اضافه استایل به خود Link
     return (
       <Link
         href={props.href}
-        style={{ textDecoration: "none", color: "inherit", display: "block", width: "100%" }}
+        style={{
+          textDecoration: "none",
+          color: "inherit",
+          display: "block",
+          width: "100%",
+        }}
         target={props.target}
       >
         {children}
@@ -36,7 +51,10 @@ const Links = ({ component: Component = "a", children, ...props }) => {
     );
   }
   return (
-    <Component {...props} style={{ textDecoration: "none", color: "inherit", display: "block", width: "100%" }}>
+    <Component
+      {...props}
+      style={{ textDecoration: "none", color: "inherit", display: "block", width: "100%" }}
+    >
       {children}
     </Component>
   );
@@ -51,6 +69,9 @@ const Logo = ({ component, href = "/", img, children }) => {
     display: "block",
     padding: "15px 22px",
     textOverflow: "ellipsis",
+    fontWeight: "bold",
+    fontSize: "1.3rem",
+    fontFamily: yekanFont.style.fontFamily,
   }));
 
   return (
@@ -64,7 +85,7 @@ const Logo = ({ component, href = "/", img, children }) => {
             sx={{ maxWidth: "120px", display: "block" }}
           />
         ) : (
-          <Typography variant="body1">{children}</Typography>
+          children
         )}
       </LogoStyled>
     </Links>
@@ -87,10 +108,12 @@ const Menu = ({ children, subHeading = "Menu" }) => {
               fontWeight: "bold",
               fontSize: 12,
               background: "transparent",
+              fontFamily: yekanFont.style.fontFamily,
             }}
           >
-            {!customizer.isCollapse ? subHeading : "..."}
+            {!customizer.isCollapse ? subHeading : ""}
           </ListSubheader>
+
         }
       >
         {children}
@@ -128,8 +151,18 @@ const MenuItem = ({
     color: customizer.textColor,
     cursor: disabled ? "default" : "pointer",
     opacity: disabled ? 0.6 : 1,
-    ".MuiListItemIcon-root": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: customizer.isCollapse ? "center" : (theme.direction === "ltr" ? "flex-start" : "flex-end"),
+    "& .MuiListItemIcon-root": {
       color: customizer.textColor,
+      minWidth: "auto",
+      marginRight: customizer.isCollapse && theme.direction === "ltr" ? 0 : 10,
+      marginLeft: customizer.isCollapse && theme.direction === "rtl" ? 0 : 10,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 36,
     },
     "&:hover": {
       backgroundColor: disabled ? "#fff" : customizer.themeColor + "20",
@@ -151,27 +184,21 @@ const MenuItem = ({
     },
   }));
 
-  const ListIConStyled = styled(ListItemIcon)(() => ({
-    minWidth: 36,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    padding: 0,
-    cursor: "pointer",
-    color: "inherit",
-  }));
-
   return (
     <Links component={component} href={link} target={target}>
       <ListItemStyled selected={isSelected} disableRipple={disabled}>
-        <ListIConStyled>{icon ? icon : <CircleOutlined />}</ListIConStyled>
+        <ListItemIcon>{icon ? icon : <CircleOutlined />}</ListItemIcon>
         {!customizer.isCollapse && (
           <>
             <ListItemText
               sx={{ my: 0 }}
               primary={
-                <Typography variant="caption" fontSize={textFontSize} lineHeight={1}>
+                <Typography
+                  variant="caption"
+                  fontSize={textFontSize}
+                  lineHeight={1}
+                  sx={{ fontFamily: yekanFont.style.fontFamily }}
+                >
                   {children}
                 </Typography>
               }
@@ -192,12 +219,13 @@ const MenuItem = ({
   );
 };
 
+
 const Profile = ({
   userName = "محمد محمدی",
   designation = "برنامه نویس",
   userimg = "https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-1.jpg",
   isCollapse = false,
-  onLogout = () => alert("Logout Successfully"),
+  onLogout = () => alert("خروج با موفقیت انجام شد"),
 }) => {
   const theme = useTheme();
   return (
@@ -212,6 +240,7 @@ const Profile = ({
             p: 2,
             borderRadius: 2,
             bgcolor: theme.palette.secondary.main + "20",
+            fontFamily: yekanFont.style.fontFamily,
           }}
         >
           <Avatar alt={userName} src={userimg} />
@@ -220,7 +249,7 @@ const Profile = ({
             <Typography variant="caption">{designation}</Typography>
           </Box>
           <Box sx={{ ml: "auto" }} onClick={onLogout} style={{ cursor: "pointer" }}>
-            <Tooltip title="Logout" placement="top">
+            <Tooltip title="خروج" placement="top">
               <IconButton color="error" size="large" aria-label="logout">
                 <LogoutOutlined />
               </IconButton>
@@ -233,21 +262,27 @@ const Profile = ({
 };
 
 const Sidebar = ({
-  width = "270px",
-  collapsewidth = "80px",
+  width = 270,
+  collapsewidth = 80,
   textColor = "#2b2b2b",
-  isCollapse = false,
   themeColor = "#5d87ff",
   themeSecondaryColor = "#49beff",
   mode = "light",
-  direction = "ltr",
+  direction = "rtl",
   userName,
   designation,
   userimg,
   onLogout,
+  children,
 }) => {
-  const [isSidebarHover, setIsSidebarHover] = useState(false);
-  const toggleWidth = isCollapse && !isSidebarHover ? collapsewidth : width;
+  const [isCollapse, setIsCollapse] = useState(false);
+  const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  // روی دسکتاپ collapse می‌کنه، روی موبایل سایدبار به صورت drawer باز/بسته میشه
+  const sidebarWidth = isCollapse ? collapsewidth : width;
 
   const myTheme = createTheme({
     direction,
@@ -278,51 +313,199 @@ const Sidebar = ({
       >
         <Box
           sx={{
-            width: toggleWidth,
-            flexShrink: 0,
-            color: textColor,
-            bgcolor: mode === "dark" ? "#222" : "#fff",
+            display: "flex",
             height: "100vh",
-            overflowY: "auto",
+            bgcolor: mode === "dark" ? "#222" : "#fff",
+            position: "relative",
           }}
-          onMouseEnter={() => setIsSidebarHover(true)}
-          onMouseLeave={() => setIsSidebarHover(false)}
         >
-          <Logo
-            component={Link}
-            href="/"
-            img=""
-          >
-            همگامان دانش
-          </Logo>
-
-          <Menu subHeading="مدیریت">
-            <MenuItem
-              icon={<ManageAccounts />}
-              component={Link}
-              link="/users-setting"
-              badge={true}
-              isSelected={true}
+          {/* دکمه باز/بسته کردن موبایل */}
+          {isSmallScreen && (
+            <IconButton
+              onClick={() => setIsSidebarOpenMobile(true)}
+              sx={{
+                position: "fixed",
+                top: 16,
+                left: direction === "rtl" ? "auto" : 16,
+                right: direction === "rtl" ? 16 : "auto",
+                zIndex: 1500,
+                bgcolor: "#5d87ff",
+                color: "#fff",
+                "&:hover": { bgcolor: "#4a6de0" },
+              }}
+              aria-label="باز کردن منو"
+              size="large"
             >
-              مدیریت کاربران
-            </MenuItem>
-            <MenuItem icon={<VideoLibrary />} component={Link} link="/manage-course">
-              مدیریت دوره ها
-            </MenuItem>
-          </Menu>
+              <MenuIcon />
+            </IconButton>
+          )}
 
-          <Menu subHeading="دوره ها">
-            <MenuItem icon={<SchoolOutlined />} link="/my-courses">دوره های من</MenuItem>
-          </Menu>
+          {/* سایدبار دسکتاپ */}
+          {!isSmallScreen && (
+            <Box
+              sx={{
+                width: sidebarWidth,
+                flexShrink: 0,
+                color: textColor,
+                bgcolor: mode === "dark" ? "#222" : "#fff",
+                overflowY: "auto",
+                transition: "width 0.3s ease",
+                borderRight: direction === "ltr" ? `1px solid #ddd` : "none",
+                borderLeft: direction === "rtl" ? `1px solid #ddd` : "none",
+                display: "flex",
+                flexDirection: "column",
+              }}
+              onMouseEnter={() => {
+                if (isCollapse) setIsCollapse(false);
+              }}
+              onMouseLeave={() => {
+                if (!isCollapse) setIsCollapse(true);
+              }}
+            >
+              <Logo component={Link} href="/" img="">
+                همگامان دانش
+              </Logo>
 
+              <Menu subHeading="مدیریت">
+                <MenuItem
+                  icon={<ManageAccounts />}
+                  component={Link}
+                  link="/users-setting"
+                  badge={true}
+                  isSelected={true}
+                >
+                  مدیریت کاربران
+                </MenuItem>
+                <MenuItem icon={<VideoLibrary />} component={Link} link="/manage-course">
+                  مدیریت دوره ها
+                </MenuItem>
+              </Menu>
 
-          <Profile
-            userName={userName}
-            designation={designation}
-            userimg={userimg}
-            isCollapse={isCollapse}
-            onLogout={onLogout}
-          />
+              <Menu subHeading="دوره ها">
+                <MenuItem icon={<SchoolOutlined />} link="/my-courses">
+                  دوره های من
+                </MenuItem>
+              </Menu>
+
+              <Profile
+                userName={userName}
+                designation={designation}
+                userimg={userimg}
+                isCollapse={isCollapse}
+                onLogout={onLogout}
+              />
+
+              {/* دکمه toggle باز/بسته کردن */}
+              <Box sx={{ flexGrow: 1 }} />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  mb: 2,
+                }}
+              >
+                <IconButton
+                  onClick={() => setIsCollapse(!isCollapse)}
+                  aria-label={isCollapse ? "باز کردن سایدبار" : "بستن سایدبار"}
+                  sx={{
+                    color: textColor,
+                    bgcolor: "#f0f0f0",
+                    "&:hover": { bgcolor: "#e0e0e0" },
+                  }}
+                  size="small"
+                >
+                  {isCollapse ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+              </Box>
+            </Box>
+          )}
+
+          {/* سایدبار موبایل به صورت drawer */}
+          {isSmallScreen && isSidebarOpenMobile && (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 0,
+                bottom: 0,
+                width: 270,
+                bgcolor: "#fff",
+                zIndex: 1600,
+                direction,
+                boxShadow: "0 0 15px rgba(0,0,0,0.3)",
+                overflowY: "auto",
+                p: 1,
+                display: "flex",
+                flexDirection: "column",
+                animation: "slideIn 0.3s forwards",
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <IconButton
+                  onClick={() => setIsSidebarOpenMobile(false)}
+                  aria-label="بستن منو"
+                  size="large"
+                >
+                  <ChevronLeftIcon />
+                </IconButton>
+              </Box>
+
+              <Logo component={Link} href="/" img="">
+                همگامان دانش
+              </Logo>
+
+              <Menu subHeading="مدیریت">
+                <MenuItem
+                  icon={<ManageAccounts />}
+                  component={Link}
+                  link="/users-setting"
+                  badge={true}
+                  isSelected={true}
+                >
+                  مدیریت کاربران
+                </MenuItem>
+                <MenuItem icon={<VideoLibrary />} component={Link} link="/manage-course">
+                  مدیریت دوره ها
+                </MenuItem>
+              </Menu>
+
+              <Menu subHeading="دوره ها">
+                <MenuItem icon={<SchoolOutlined />} link="/my-courses">
+                  دوره های من
+                </MenuItem>
+              </Menu>
+
+              <Profile
+                userName={userName}
+                designation={designation}
+                userimg={userimg}
+                isCollapse={false}
+                onLogout={onLogout}
+              />
+            </Box>
+          )}
+
+          {/* محتوای اصلی */}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              p: 3,
+              overflowY: "auto",
+              fontFamily: yekanFont.style.fontFamily,
+              direction,
+              transition: "margin 0.3s ease",
+              marginLeft:
+                !isSmallScreen && !isCollapse && direction === "ltr"
+                  ? `${sidebarWidth}px`
+                  : undefined,
+              marginRight:
+                !isSmallScreen && !isCollapse && direction === "rtl"
+                  ? `${sidebarWidth}px`
+                  : undefined,
+            }}
+          >
+            {children}
+          </Box>
         </Box>
       </SidebarContext.Provider>
     </ThemeProvider>
