@@ -18,6 +18,7 @@ import CottageOutlinedIcon from "@mui/icons-material/CottageOutlined";
 import AccessAlarms from "@mui/icons-material/AccessAlarms";
 import CircleOutlined from "@mui/icons-material/CircleOutlined";
 import { LogoutOutlined, ManageAccounts, SchoolOutlined, VideoLibrary } from "@mui/icons-material";
+import { yekanFont } from "@/utils/fonts";
 
 export const SidebarContext = createContext();
 
@@ -250,6 +251,9 @@ const Sidebar = ({
 
   const myTheme = createTheme({
     direction,
+    typography: {
+      fontFamily: yekanFont.style.fontFamily || "'Yekan', sans-serif",
+    },
     palette: {
       mode,
       primary: { main: themeColor },
@@ -276,7 +280,6 @@ const Sidebar = ({
           sx={{
             width: toggleWidth,
             flexShrink: 0,
-            fontFamily: "inherit",
             color: textColor,
             bgcolor: mode === "dark" ? "#222" : "#fff",
             height: "100vh",
